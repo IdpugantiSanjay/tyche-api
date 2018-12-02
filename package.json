@@ -1,0 +1,21 @@
+{
+  "name": "tyche-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Sanjay Idpuganti",
+  "license": "ISC",
+  "repository": {
+    "url": "https://sanjay11.visualstudio.com/tyche-api/_git/tyche-api"
+  },
+  "dependencies": {
+    "hapi": "^17.8.1"
+  },
+  "devDependencies": {
+    "@types/hapi": "^17.8.0"
+  }
+}
