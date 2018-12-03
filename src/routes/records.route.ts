@@ -1,18 +1,27 @@
 import * as Hapi from 'hapi';
 
+import Boom from 'boom';
+
+import { searchRecords, createRecord } from '../services/records.service';
+
+const validateRecord = function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+  throw Boom.badRequest('Fuck this shit');
+};
+
 const records: Hapi.ServerRoute = {
   path: '/api/{username}/records',
   method: 'GET',
-  handler: function(request: Hapi.Request) {
-    return [{ id: 1, amount: 250 }];
-  }
+  handler: searchRecords
 };
 
 // add a user record
 const addRecord: Hapi.ServerRoute = {
   path: '/api/{username}/records',
   method: 'POST',
-  handler: function(request: Hapi.Request) {}
+  options: {
+    pre: [{ method: validateRecord, assign: 'valid', failAction: 'error' }],
+    handler: createRecord
+  }
 };
 
 const updateRecord: Hapi.ServerRoute = {
