@@ -44,8 +44,15 @@ const validateRecordId = function(request: Hapi.Request, h: Hapi.ResponseToolkit
 const records: Hapi.ServerRoute = {
   path: "/api/{username}/records",
   method: "GET",
-  handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-    return searchRecords(request.params.username);
+  options: {
+    cache: {
+      expiresIn: 60 * 1000,
+      privacy: "public"
+    },
+    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+      const results = searchRecords(request.params.username);
+      return results;
+    }
   }
 };
 
@@ -84,3 +91,5 @@ const deleteRecordRoute: Hapi.ServerRoute = {
 };
 
 export const recordRoutes = [records, addRecord, deleteRecordRoute, updateRecordRoute];
+
+// TODO remove pre handler with validate property
