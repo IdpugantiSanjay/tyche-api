@@ -1,14 +1,14 @@
-import * as Hapi from "hapi";
-import Boom from "boom";
-import Joi from "joi";
+import * as Hapi from 'hapi';
+import Boom from 'boom';
+import Joi from 'joi';
 
 import {
   searchRecords,
   createRecord,
   deleteRecord,
   updateRecord
-} from "../services/records.service";
-import { IRecord } from "../../ts.models/record.model";
+} from '../services/records.service';
+import { IRecord } from '../../ts.models/record.model';
 
 /**
  * Validate if request contains correct payload details
@@ -21,7 +21,7 @@ const validateRecord = function(request: Hapi.Request, h: Hapi.ResponseToolkit) 
   if (record.description && record.value && record.category) {
     return true;
   } else {
-    throw Boom.badRequest("Invalid record details");
+    throw Boom.badRequest('Invalid record details');
   }
 };
 
@@ -36,19 +36,15 @@ const validateRecordId = function(request: Hapi.Request, h: Hapi.ResponseToolkit
   const result = schema.validate(request.params.id);
 
   if (result.error) {
-    throw Boom.badRequest("Invalid id");
+    throw Boom.badRequest('Invalid id');
   }
   return true;
 };
 
 const records: Hapi.ServerRoute = {
-  path: "/api/{username}/records",
-  method: "GET",
+  path: '/api/{username}/records',
+  method: 'GET',
   options: {
-    cache: {
-      expiresIn: 60 * 1000,
-      privacy: "public"
-    },
     handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
       const results = searchRecords(request.params.username);
       return results;
@@ -58,10 +54,10 @@ const records: Hapi.ServerRoute = {
 
 // add a user record
 const addRecord: Hapi.ServerRoute = {
-  path: "/api/{username}/records",
-  method: "POST",
+  path: '/api/{username}/records',
+  method: 'POST',
   options: {
-    pre: [{ method: validateRecord, assign: "valid", failAction: "error" }],
+    pre: [{ method: validateRecord, assign: 'valid', failAction: 'error' }],
     handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
       return createRecord(request.payload as IRecord);
     }
@@ -69,10 +65,10 @@ const addRecord: Hapi.ServerRoute = {
 };
 
 const updateRecordRoute: Hapi.ServerRoute = {
-  path: "/api/{username}/records/{id}",
-  method: "PUT",
+  path: '/api/{username}/records/{id}',
+  method: 'PUT',
   options: {
-    pre: [{ method: validateRecord, assign: "valid", failAction: "error" }],
+    pre: [{ method: validateRecord, assign: 'valid', failAction: 'error' }],
     handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
       return updateRecord(request.params.id, request.payload as IRecord);
     }
@@ -80,10 +76,10 @@ const updateRecordRoute: Hapi.ServerRoute = {
 };
 
 const deleteRecordRoute: Hapi.ServerRoute = {
-  path: "/api/{username}/records/{id}",
-  method: "DELETE",
+  path: '/api/{username}/records/{id}',
+  method: 'DELETE',
   options: {
-    pre: [{ method: validateRecordId, assign: "valid", failAction: "error" }],
+    pre: [{ method: validateRecordId, assign: 'valid', failAction: 'error' }],
     handler: async function(request: Hapi.Request) {
       return deleteRecord(request.params.id);
     }
