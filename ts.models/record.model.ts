@@ -7,6 +7,5 @@ export interface IRecord {
 
   username: string;
   category: string;
-
   type: RecordType;
 }

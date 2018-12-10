@@ -1,6 +1,7 @@
 import * as Hapi from "hapi";
 
 import { recordRoutes } from "./routes/records.route";
+import { categoryRoutes } from "./routes/categories.route";
 
 import mongoose from "mongoose";
 import { connectionString } from "./config";
@@ -22,6 +23,7 @@ const server = new Hapi.Server({
 });
 
 server.route(recordRoutes);
+server.route(categoryRoutes);
 
 // start the server
 const init = async () => {
