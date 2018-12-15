@@ -1,11 +1,12 @@
-import { RecordType } from "../src/enums/recordtype.enum";
+import { RecordType } from '../enums/recordtype.enum';
 
 export interface IRecord {
   _id: string;
   value: number;
   description: string;
-
-  username: string;
   category: string;
   type: RecordType;
+  createdDate: Date;
+
+  username: string;
 }

@@ -1,51 +1,21 @@
 import * as Hapi from 'hapi';
-import Boom from 'boom';
-import Joi from 'joi';
 
+import { searchRecords, createRecord, updateRecord, deleteRecord, totalSum } from '../services/records.service';
+import { IRecord } from '../ts.models/record.model';
 import {
-  searchRecords,
-  createRecord,
-  deleteRecord,
-  updateRecord
-} from '../services/records.service';
-import { IRecord } from '../../ts.models/record.model';
+  addRecordRouteValidate,
+  searchRecordsRouteValidate,
+  updateRecordRouteValidate,
+  deleteRecordRouteValidate,
+  totalSumRouteValidate
+} from '../validators/records-route.validators';
 
-/**
- * Validate if request contains correct payload details
- * @param request request object containing new record details as payload
- * @param h
- */
-const validateRecord = function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-  const record: IRecord = request.payload as any;
-  // TODO replace with Joi schema
-  if (record.description && record.value && record.category) {
-    return true;
-  } else {
-    throw Boom.badRequest('Invalid record details');
-  }
-};
-
-/**
- * Check if the http request has record id in params
- * @param request http request object containing the id of the record
- * @param h response toolkit object
- */
-const validateRecordId = function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-  const schema = Joi.string().min(1);
-
-  const result = schema.validate(request.params.id);
-
-  if (result.error) {
-    throw Boom.badRequest('Invalid id');
-  }
-  return true;
-};
-
-const records: Hapi.ServerRoute = {
+const searchRecordsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records',
   method: 'GET',
   options: {
-    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+    validate: searchRecordsRouteValidate(),
+    handler: async function(request: Hapi.Request) {
       const results = searchRecords(request.params.username);
       return results;
     }
@@ -53,13 +23,13 @@ const records: Hapi.ServerRoute = {
 };
 
 // add a user record
-const addRecord: Hapi.ServerRoute = {
+const addRecordRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records',
   method: 'POST',
   options: {
-    pre: [{ method: validateRecord, assign: 'valid', failAction: 'error' }],
-    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-      return createRecord(request.payload as IRecord);
+    validate: addRecordRouteValidate(),
+    handler: async function(request: Hapi.Request) {
+      return createRecord(request.params.username, request.payload as IRecord);
     }
   }
 };
@@ -68,8 +38,8 @@ const updateRecordRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/{id}',
   method: 'PUT',
   options: {
-    pre: [{ method: validateRecord, assign: 'valid', failAction: 'error' }],
-    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+    validate: updateRecordRouteValidate(),
+    handler: async function(request: Hapi.Request) {
       return updateRecord(request.params.id, request.payload as IRecord);
     }
   }
@@ -79,13 +49,24 @@ const deleteRecordRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/{id}',
   method: 'DELETE',
   options: {
-    pre: [{ method: validateRecordId, assign: 'valid', failAction: 'error' }],
+    validate: deleteRecordRouteValidate(),
     handler: async function(request: Hapi.Request) {
       return deleteRecord(request.params.id);
     }
   }
 };
 
-export const recordRoutes = [records, addRecord, deleteRecordRoute, updateRecordRoute];
+const totalSumRoute: Hapi.ServerRoute = {
+  path: '/api/{username}/records/total',
+  method: 'GET',
+  options: {
+    validate: totalSumRouteValidate(),
+    handler: async function(request: Hapi.Request) {
+      const queryParams = request.query as Hapi.RequestQuery;
+      const { startTime, endTime } = queryParams;
+      return totalSum(request.params.username, new Date(startTime as string), new Date(endTime as string));
+    }
+  }
+};
 
-// TODO remove pre handler with validate property
+export const recordRoutes = [searchRecordsRoute, addRecordRoute, updateRecordRoute, deleteRecordRoute, totalSumRoute];

@@ -1,5 +1,5 @@
-import { CategoryModel } from "../mongodb.models/category.model";
-import { Category } from "../../ts.models/category.model";
+import { CategoryModel } from '../mongodb.models/category.model';
+import { Category } from '../ts.models/category.model';
 
 export async function categories() {
   const categories = await CategoryModel.find({});
