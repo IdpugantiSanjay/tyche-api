@@ -14,9 +14,11 @@
     "url": "https://sanjay11.visualstudio.com/tyche-api/_git/tyche-api"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.119",
     "boom": "^7.3.0",
     "hapi": "^17.8.1",
     "joi": "^14.3.0",
+    "lodash": "^4.17.11",
     "mongoose": "^5.3.14"
   },
   "devDependencies": {
