@@ -48,7 +48,7 @@ export async function searchRecord(record: IRecord) {
  * @param record record object conatining any properties to filter on
  */
 export async function searchRecords(username: string, record?: IRecord) {
-  const response = await Records.find({ username });
+  const response = await Records.find({ username }).sort({ createdDate: -1 });
   return response;
 }
 
