@@ -14,7 +14,7 @@ mongoose
   .catch(err => console.log(err));
 
 export const server = new Hapi.Server({
-  port: 3000 || process.env.port,
+  port: process.env.port || 3000,
   routes: {
     cors: {
       origin: ['*']
