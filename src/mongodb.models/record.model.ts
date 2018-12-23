@@ -5,7 +5,8 @@ const recordSchema = new mongoose.Schema({
   description: { type: String },
   username: { type: String, required: true },
   category: { type: String, required: true },
-  createdDate: { type: Date, default: new Date().toISOString() }
+  createdDate: { type: Date, default: new Date().toISOString() },
+  type: { type: Number, required: true }
 });
 
 export const Records = mongoose.model('Records', recordSchema);

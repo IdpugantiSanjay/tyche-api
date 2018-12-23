@@ -5,6 +5,7 @@ import { categoryRoutes } from './routes/categories.route';
 
 import mongoose from 'mongoose';
 import { connectionString } from './config';
+import { Records } from './mongodb.models/record.model';
 
 mongoose
   .connect(

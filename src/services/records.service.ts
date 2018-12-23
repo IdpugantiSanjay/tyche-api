@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { Records } from '../mongodb.models/record.model';
 import { IRecord } from '../ts.models/record.model';
+import { RecordType } from '../enums/recordtype.enum';
 
 /**
  * Create a record with username
@@ -61,10 +62,19 @@ export async function searchRecords(username: string, record?: IRecord) {
 export async function totalSum(username: string, startTime: Date, endTime: Date): Promise<any> {
   const aggregateResult = await Records.aggregate([
     { $match: { username, createdDate: { $lte: endTime, $gte: startTime } } },
-    { $group: { _id: null, total: { $sum: '$value' } } }
+    { $group: { _id: '$type', total: { $sum: '$value' } } }
   ]);
 
-  const totalSum = (aggregateResult[0] || {}).total || 0;
+  const total = aggregateTotal(aggregateResult);
+  return total(RecordType.Income) - total(RecordType.Expense);
+}
 
-  return totalSum;
+/**
+ * Return a function that returns total value of type of aggregate
+ * @param aggregates positive and negative aggregate totals
+ */
+function aggregateTotal(aggregates: Array<any>): (type: number) => number {
+  return function(type: number) {
+    return (_.find(aggregates, ['_id', type]) || {}).total || 0;
+  };
 }
