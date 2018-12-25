@@ -1,11 +1,13 @@
 import * as Hapi from 'hapi';
+import webpush from 'web-push';
 
 import { recordRoutes } from './routes/records.route';
 import { categoryRoutes } from './routes/categories.route';
 
 import mongoose from 'mongoose';
+
 import { connectionString } from './config';
-import { Records } from './mongodb.models/record.model';
+import { exportRecords } from './services/records.service';
 
 mongoose
   .connect(
@@ -23,11 +25,28 @@ export const server = new Hapi.Server({
   }
 });
 
+const publicKey = 'BNsTGbCeYfPwet42DdxaJYbuDfJQUwMjASNHfbWdIk0ian-e0v6t13iKyIyJbtjdPLOkNFSe-fBneIgR8PvmqV0';
+const privateKey = 'RKs66TcEnr2N8Dk1mCVJ-GTmsNvVAJHo97uS6rjhAnY';
+
+webpush.setVapidDetails('mailto:isanjay112@gmail.com', publicKey, privateKey);
+
 server.route({
   method: 'GET',
   path: '/',
-  handler: function() {
-    return 'Hello, World';
+  handler: exportRecords
+});
+
+server.route({
+  method: 'POST',
+  path: '/subscribe',
+  handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+    const subscription = request.payload;
+    const payload = JSON.stringify({ title: 'Payment Pending' });
+
+    webpush.sendNotification(subscription as any, payload as any).catch(console.log);
+    // webpush.sendNotification(subscription as any, payload as any).catch(console.log);
+
+    return 'Sent Notification';
   }
 });
 

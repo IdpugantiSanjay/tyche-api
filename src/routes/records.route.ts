@@ -9,6 +9,8 @@ import {
   deleteRecordRouteValidate,
   totalSumRouteValidate
 } from '../validators/records-route.validators';
+import { Records } from '../mongodb.models/record.model';
+import Axios from 'axios';
 
 const searchRecordsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records',
@@ -69,4 +71,33 @@ const totalSumRoute: Hapi.ServerRoute = {
   }
 };
 
-export const recordRoutes = [searchRecordsRoute, addRecordRoute, updateRecordRoute, deleteRecordRoute, totalSumRoute];
+const exportRecordsRoute: Hapi.ServerRoute = {
+  path: '/api/{username}/records/export',
+  method: 'GET',
+  options: {
+    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+      try {
+        const data = await Records.find({ username: 'sanjay' });
+        const serverResponse = await Axios.post('http://localhost:5000/api/csv', data, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        return h
+          .response({ data: serverResponse.data })
+          .type('text/plain')
+          .code(200);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+};
+
+export const recordRoutes = [
+  searchRecordsRoute,
+  addRecordRoute,
+  updateRecordRoute,
+  deleteRecordRoute,
+  totalSumRoute,
+  exportRecordsRoute
+];

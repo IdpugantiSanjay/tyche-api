@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Records } from '../mongodb.models/record.model';
 import { IRecord } from '../ts.models/record.model';
 import { RecordType } from '../enums/recordtype.enum';
+import Axios from 'axios';
 
 /**
  * Create a record with username
@@ -77,4 +78,17 @@ function aggregateTotal(aggregates: Array<any>): (type: number) => number {
   return function(type: number) {
     return (_.find(aggregates, ['_id', type]) || {}).total || 0;
   };
+}
+
+export async function exportRecords(username: string) {
+  const records = await Records.find({ username });
+
+  try {
+    const response = await Axios.post('http://localhost:5000/api/csv', records, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
 }
