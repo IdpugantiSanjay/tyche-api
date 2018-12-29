@@ -1,5 +1,6 @@
 import * as Joi from 'joi';
 import * as Hapi from 'hapi';
+import { routeParamsUsernameSchema } from './common.validators';
 
 function addRecordRoutePayloadSchema() {
   const schema = Joi.object().keys({
@@ -18,14 +19,6 @@ function addRecordRoutePayloadSchema() {
     category: Joi.string().required()
   });
 
-  return schema;
-}
-
-function routeParamsUsernameSchema() {
-  const schema = Joi.string()
-    .required()
-    .min(3)
-    .max(128);
   return schema;
 }
 
