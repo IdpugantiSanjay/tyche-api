@@ -26,7 +26,8 @@ export const server = new Hapi.Server({
   }
 });
 
-const publicKey = 'BNsTGbCeYfPwet42DdxaJYbuDfJQUwMjASNHfbWdIk0ian-e0v6t13iKyIyJbtjdPLOkNFSe-fBneIgR8PvmqV0';
+const publicKey =
+  'BNsTGbCeYfPwet42DdxaJYbuDfJQUwMjASNHfbWdIk0ian-e0v6t13iKyIyJbtjdPLOkNFSe-fBneIgR8PvmqV0';
 const privateKey = 'RKs66TcEnr2N8Dk1mCVJ-GTmsNvVAJHo97uS6rjhAnY';
 
 webpush.setVapidDetails('mailto:isanjay112@gmail.com', publicKey, privateKey);
@@ -34,7 +35,9 @@ webpush.setVapidDetails('mailto:isanjay112@gmail.com', publicKey, privateKey);
 server.route({
   method: 'GET',
   path: '/',
-  handler: exportRecords
+  handler: function() {
+    return 'Hello, World';
+  }
 });
 
 server.route({
