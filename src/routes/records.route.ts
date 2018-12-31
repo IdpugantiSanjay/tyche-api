@@ -1,6 +1,13 @@
 import * as Hapi from 'hapi';
 
-import { searchRecords, createRecord, updateRecord, deleteRecord, totalSum } from '../services/records.service';
+import {
+  searchRecords,
+  createRecord,
+  updateRecord,
+  deleteRecord,
+  totalSum,
+  recordsStatistics
+} from '../services/records.service';
 import { IRecord } from '../ts.models/record.model';
 import {
   addRecordRouteValidate,
@@ -93,11 +100,22 @@ const exportRecordsRoute: Hapi.ServerRoute = {
   }
 };
 
+const statisticsRoute: Hapi.ServerRoute = {
+  path: '/api/{username}/records/statistics',
+  method: 'GET',
+  options: {
+    handler: function(request: Hapi.Request) {
+      return recordsStatistics(request.params.username);
+    }
+  }
+};
+
 export const recordRoutes = [
   searchRecordsRoute,
   addRecordRoute,
   updateRecordRoute,
   deleteRecordRoute,
   totalSumRoute,
-  exportRecordsRoute
+  exportRecordsRoute,
+  statisticsRoute
 ];

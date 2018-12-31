@@ -8,7 +8,7 @@ const addBudgetsRoute: Hapi.ServerRoute = {
   method: 'POST',
   options: {
     validate: addBudgetsRouteValidate(),
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       return createBudgets(request.params.username, request.payload as IBudget[]);
     }
   }
@@ -18,7 +18,7 @@ const searchBudgetsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/budgets',
   method: 'GET',
   options: {
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       return searchBudgets(request.params.username as string, request.params.name);
     }
   }

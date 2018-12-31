@@ -1,6 +1,6 @@
 export enum BudgetName {
   DAILY = 'dailyBudget',
   WEEKLY = 'weeklyBudget',
-  MONHTLY = 'monhtlyBudget',
+  MONTHLY = 'monthlyBudget',
   YEARLY = 'yearlyBudget'
 }

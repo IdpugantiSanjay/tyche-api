@@ -1,4 +1,5 @@
 export interface IBudget {
-  value?: number;
+  value: number;
   name: string;
+  label: string;
 }
