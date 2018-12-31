@@ -5,10 +5,10 @@ import Axios from 'axios';
 import { Budget } from '../mongodb.models/budget.model';
 import { BudgetName } from '../enums/budgetname.enum';
 
-import R from 'ramda';
 import { csvServiceUrl } from '../config';
 
-const { merge } = R;
+import R from 'ramda';
+const { merge, pipe, find, propEq, propOr } = R;
 
 const config = {
   headers: { 'Content-Type': 'application/json' }
@@ -69,13 +69,13 @@ export async function searchRecords(username: string, record?: IRecord) {
  * @param startTime starting time of createdDate of the record
  * @param endTime ending time of createdDate of the record
  */
-export async function totalSum(username: string, startTime: Date, endTime: Date): Promise<any> {
-  const aggregateResult = await Records.aggregate([
+async function totalSum(username: string, startTime: Date, endTime: Date): Promise<any> {
+  const aggregates = await Records.aggregate([
     { $match: { username, createdDate: { $lte: endTime, $gte: startTime } } },
     { $group: { _id: '$type', total: { $sum: '$value' } } }
   ]);
 
-  const total = aggregateTotal(aggregateResult);
+  const total = aggregateTotal(aggregates);
   return total(RecordType.Income) - total(RecordType.Expense);
 }
 
@@ -83,12 +83,18 @@ export async function totalSum(username: string, startTime: Date, endTime: Date)
  * Return a function that returns total value of type of aggregate
  * @param aggregates positive and negative aggregate totals
  */
-function aggregateTotal(aggregates: Array<any>): (type: number) => number {
+type Aggregate = { _id: number; total: number };
+function aggregateTotal(aggregates: Array<Aggregate>): (type: number) => number {
   return function(type: number) {
-    if (aggregates) {
-      return aggregates.find(aggregate => aggregate._id === type);
-    }
-    return 0;
+    // find aggregate object having _id as type
+    const findAggregate: (aggregates: Array<Aggregate>) => Aggregate | undefined = find(propEq('_id', type));
+    // get total property
+    const total: (aggregate: Aggregate | undefined) => number = propOr(0, 'total');
+
+    return pipe(
+      findAggregate,
+      total
+    )(aggregates) as number;
   };
 }
 
@@ -101,9 +107,7 @@ export async function exportRecords(username: string) {
 
   try {
     // call external service to process user records in json format
-    const response = await Axios.post(csvServiceUrl, records, config);
-    // the response.data contains base64 encoded csv of records
-    return response.data;
+    return await Axios.post(csvServiceUrl, records, config);
   } catch (err) {
     console.log(err);
   }

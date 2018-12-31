@@ -5,19 +5,17 @@ import {
   createRecord,
   updateRecord,
   deleteRecord,
-  totalSum,
-  recordsStatistics
+  recordsStatistics,
+  exportRecords
 } from '../services/records.service';
 import { IRecord } from '../ts.models/record.model';
 import {
   addRecordRouteValidate,
   searchRecordsRouteValidate,
   updateRecordRouteValidate,
-  deleteRecordRouteValidate,
-  totalSumRouteValidate
+  deleteRecordRouteValidate
 } from '../validators/records-route.validators';
-import { Records } from '../mongodb.models/record.model';
-import Axios from 'axios';
+import { AxiosResponse } from 'axios';
 
 const searchRecordsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records',
@@ -65,18 +63,18 @@ const deleteRecordRoute: Hapi.ServerRoute = {
   }
 };
 
-const totalSumRoute: Hapi.ServerRoute = {
-  path: '/api/{username}/records/total',
-  method: 'GET',
-  options: {
-    validate: totalSumRouteValidate(),
-    handler: function(request: Hapi.Request) {
-      const queryParams = request.query as Hapi.RequestQuery;
-      const { startTime, endTime } = queryParams;
-      return totalSum(request.params.username, new Date(startTime as string), new Date(endTime as string));
-    }
-  }
-};
+// const totalSumRoute: Hapi.ServerRoute = {
+//   path: '/api/{username}/records/total',
+//   method: 'GET',
+//   options: {
+//     validate: totalSumRouteValidate(),
+//     handler: function(request: Hapi.Request) {
+//       const queryParams = request.query as Hapi.RequestQuery;
+//       const { startTime, endTime } = queryParams;
+//       return totalSum(request.params.username, new Date(startTime as string), new Date(endTime as string));
+//     }
+//   }
+// };
 
 const exportRecordsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/export',
@@ -84,13 +82,9 @@ const exportRecordsRoute: Hapi.ServerRoute = {
   options: {
     handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
       try {
-        const data = await Records.find({ username: 'sanjay' });
-        const serverResponse = await Axios.post('http://localhost:5000/api/csv', data, {
-          headers: { 'Content-Type': 'application/json' }
-        });
-
+        const serverResponse = (await exportRecords(request.params.username)) as AxiosResponse;
         return h
-          .response({ data: serverResponse.data })
+          .response({ data: serverResponse.data || '' })
           .type('text/plain')
           .code(200);
       } catch (err) {
@@ -115,7 +109,6 @@ export const recordRoutes = [
   addRecordRoute,
   updateRecordRoute,
   deleteRecordRoute,
-  totalSumRoute,
   exportRecordsRoute,
   statisticsRoute
 ];

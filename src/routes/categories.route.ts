@@ -3,14 +3,14 @@ import { categories, addCategory } from '../services/categories.service';
 import { Category } from '../ts.models/category.model';
 
 const categoriesRoute: Hapi.ServerRoute = {
-  path: `/api/{username}/categories`,
+  path: `/api/{username}/categories/{type}`,
   method: `GET`,
   options: {
     handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-      return await categories();
+      return await categories(request.params.type);
     },
     cache: {
-      expiresIn: 60 * 60 * 60,
+      expiresIn: 86400,
       privacy: 'public'
     }
   }
