@@ -1,13 +1,18 @@
-import _ from 'lodash';
-
 import { Records } from '../mongodb.models/record.model';
 import { IRecord } from '../ts.models/record.model';
 import { RecordType } from '../enums/recordtype.enum';
 import Axios from 'axios';
-import { Statistics } from '../ts.models/statistics.model';
 import { Budget } from '../mongodb.models/budget.model';
 import { BudgetName } from '../enums/budgetname.enum';
-import { IBudget } from '../ts.models/budget.model';
+
+import R from 'ramda';
+import { csvServiceUrl } from '../config';
+
+const { merge } = R;
+
+const config = {
+  headers: { 'Content-Type': 'application/json' }
+};
 
 /**
  * Create a record with username
@@ -15,7 +20,7 @@ import { IBudget } from '../ts.models/budget.model';
  * @param record record to create a record having properties of record
  */
 export async function createRecord(username: string, record: IRecord) {
-  const recordWithUsername = _.assign({}, record, { username });
+  const recordWithUsername = merge(record, { username });
   const response = await Records.create(recordWithUsername);
   return response;
 }
@@ -80,17 +85,24 @@ export async function totalSum(username: string, startTime: Date, endTime: Date)
  */
 function aggregateTotal(aggregates: Array<any>): (type: number) => number {
   return function(type: number) {
-    return (_.find(aggregates, ['_id', type]) || {}).total || 0;
+    if (aggregates) {
+      return aggregates.find(aggregate => aggregate._id === type);
+    }
+    return 0;
   };
 }
 
+/**
+ * Call external service to convert JSON data structure to CSV format
+ * @param username
+ */
 export async function exportRecords(username: string) {
   const records = await Records.find({ username });
 
   try {
-    const response = await Axios.post('http://localhost:5000/api/csv', records, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // call external service to process user records in json format
+    const response = await Axios.post(csvServiceUrl, records, config);
+    // the response.data contains base64 encoded csv of records
     return response.data;
   } catch (err) {
     console.log(err);
@@ -98,20 +110,22 @@ export async function exportRecords(username: string) {
 }
 
 export async function recordsStatistics(username: string) {
-  const rangeStatistics = statistics(username);
+  const budget = statistics(username);
 
-  const dayStatistics = rangeStatistics(BudgetName.DAILY)(...Range.day);
-  const weekStatistics = rangeStatistics(BudgetName.WEEKLY)(...Range.week);
-  const monthStatistics = rangeStatistics(BudgetName.MONTHLY)(...Range.month);
-  const yearStatistics = rangeStatistics(BudgetName.YEARLY)(...Range.year);
+  const overallStats = [
+    budget(BudgetName.DAILY)(...Range.day),
+    budget(BudgetName.WEEKLY)(...Range.week),
+    budget(BudgetName.MONTHLY)(...Range.month),
+    budget(BudgetName.YEARLY)(...Range.year)
+  ];
 
-  return await Promise.all([dayStatistics, weekStatistics, monthStatistics, yearStatistics]);
+  return await Promise.all(overallStats);
 
   /**
    * @param username name of the user
    */
   function statistics(username: string) {
-    return function(budgetName: BudgetName) {
+    return function budgetRange(budgetName: BudgetName) {
       return function range(from: Date, to: Date): Promise<BudgetConsumption> {
         const budgetPromise = Budget.findOne({ username, name: budgetName });
         const consumedPromise = totalSum(username, from, to);
@@ -121,8 +135,8 @@ export async function recordsStatistics(username: string) {
   }
 
   function calculate(response: any[]): BudgetConsumption {
-    const budget: IBudget = response[0];
-    const consumed: number = response[1];
+    const [budget, consumed] = response;
+
     return {
       name: budget.name,
       percentageConsumed: consumed < 0 ? Math.abs((consumed / budget.value) * 100) : 0,
@@ -131,8 +145,6 @@ export async function recordsStatistics(username: string) {
     };
   }
 }
-
-type BudgetConsumption = { name: string; percentageConsumed: number; consumed: number; label: String };
 
 export class Range {
   static get day(): [Date, Date] {
@@ -144,9 +156,12 @@ export class Range {
   }
 
   static get week(): [Date, Date] {
-    const curr = new Date(); // get current date
-    const first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-    const last = first + 6; // last day is the first day + 6
+    // get current date
+    const curr = new Date();
+    // First day is the day of the month - the day of the week
+    const first = curr.getDate() - curr.getDay();
+    // last day is the first day + 6
+    const last = first + 6;
 
     const firstday = new Date(curr.setDate(first));
     const lastday = new Date(curr.setDate(last));
@@ -158,11 +173,11 @@ export class Range {
 
   static get month(): [Date, Date] {
     const [thisMonth, thisYear] = [new Date().getMonth(), new Date().getFullYear()];
-    return [new Date(thisYear, thisMonth, 1), new Date(thisYear, thisMonth + 1, 0)];
+    return [new Date(thisYear, thisMonth, 1, 0, 0, 0), new Date(thisYear, thisMonth + 1, 0, 23, 59, 59)];
   }
 
   static get year(): [Date, Date] {
     const thisYear = new Date().getFullYear();
-    return [new Date(thisYear, 0, 1), new Date(thisYear, 11, 31)];
+    return [new Date(thisYear, 0, 1, 0, 0, 0), new Date(thisYear, 11, 31, 23, 59, 59)];
   }
 }

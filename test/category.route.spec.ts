@@ -8,10 +8,10 @@ lab.experiment('Categories', function() {
   lab.test('Category List Length', async function() {
     const response = await server.inject({ url: '/api/sanjay/categories', method: 'GET' });
 
-    expect(JSON.parse(response.payload).length).to.be.equal(5);
+    expect(JSON.parse(response.payload).length).to.be.equal(8);
   });
 
-  lab.test('Category List Validity', async function() {
+  lab.test('Every item in list is not empty', async function() {
     const response = await server.inject({ url: '/api/sanjay/categories', method: 'GET' });
 
     const categories: Category[] = JSON.parse(response.payload);
@@ -21,5 +21,15 @@ lab.experiment('Categories', function() {
       expect(category.name).to.exist();
       expect(category._id).to.exist();
     });
+  });
+
+  lab.test('Unique Index', async function() {
+    const response = await server.inject({
+      url: '/api/sanjay/categories',
+      method: 'POST',
+      payload: { name: 'Salary', type: 'Income' }
+    });
+
+    expect(response.statusCode).to.equal(200);
   });
 });

@@ -24,7 +24,7 @@ const searchRecordsRoute: Hapi.ServerRoute = {
   method: 'GET',
   options: {
     validate: searchRecordsRouteValidate(),
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       const results = searchRecords(request.params.username);
       return results;
     }
@@ -37,7 +37,7 @@ const addRecordRoute: Hapi.ServerRoute = {
   method: 'POST',
   options: {
     validate: addRecordRouteValidate(),
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       return createRecord(request.params.username, request.payload as IRecord);
     }
   }
@@ -48,7 +48,7 @@ const updateRecordRoute: Hapi.ServerRoute = {
   method: 'PUT',
   options: {
     validate: updateRecordRouteValidate(),
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       return updateRecord(request.params.id, request.payload as IRecord);
     }
   }
@@ -59,7 +59,7 @@ const deleteRecordRoute: Hapi.ServerRoute = {
   method: 'DELETE',
   options: {
     validate: deleteRecordRouteValidate(),
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       return deleteRecord(request.params.id);
     }
   }
@@ -70,7 +70,7 @@ const totalSumRoute: Hapi.ServerRoute = {
   method: 'GET',
   options: {
     validate: totalSumRouteValidate(),
-    handler: async function(request: Hapi.Request) {
+    handler: function(request: Hapi.Request) {
       const queryParams = request.query as Hapi.RequestQuery;
       const { startTime, endTime } = queryParams;
       return totalSum(request.params.username, new Date(startTime as string), new Date(endTime as string));
