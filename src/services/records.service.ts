@@ -160,29 +160,12 @@ export class Range {
   }
 
   static get week(): [Date, Date] {
-    // get current date
-    // const curr = new Date();
-    // // First day is the day of the month - the day of the week
-    // const first = curr.getDate() - curr.getDay();
-    // // last day is the first day + 6
-    // const last = first + 6;
-
-    // const firstday = new Date(curr.setDate(first));
-    // const lastday = new Date(curr.setDate(last));
-
-    // firstday.setHours(0, 0, 0);
-    // lastday.setHours(23, 59, 59);
-
-    // console.log(firstday, lastday);
-
     var curr = new Date();
     var day = curr.getDay();
     //will return firstday (ie sunday) of the week
     var firstday = new Date(curr.getTime() - 60 * 60 * 24 * day * 1000);
     //adding (60*60*6*24*1000) means adding six days to the firstday which results in lastday (saturday) of the week
     var lastday = new Date(curr.getTime() + 60 * 60 * 24 * 6 * 1000);
-
-    console.log(firstday, lastday);
 
     return [firstday, lastday];
   }
