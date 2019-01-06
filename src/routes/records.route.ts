@@ -6,7 +6,8 @@ import {
   updateRecord,
   deleteRecord,
   recordsStatistics,
-  exportRecords
+  exportRecords,
+  categorySum
 } from '../services/records.service';
 import { IRecord } from '../ts.models/record.model';
 import {
@@ -76,6 +77,20 @@ const deleteRecordRoute: Hapi.ServerRoute = {
 //   }
 // };
 
+const categoryGroupedSumRoute: Hapi.ServerRoute = {
+  path: '/api/{username}/records/categories/sum',
+  method: 'GET',
+  options: {
+    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+      try {
+        return categorySum(request.params.username);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+};
+
 const exportRecordsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/export',
   method: 'GET',
@@ -110,5 +125,6 @@ export const recordRoutes = [
   updateRecordRoute,
   deleteRecordRoute,
   exportRecordsRoute,
-  statisticsRoute
+  statisticsRoute,
+  categoryGroupedSumRoute
 ];

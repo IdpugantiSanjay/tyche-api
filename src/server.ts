@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 
 import { connectionString } from './config';
 import { budgetRoutes } from './routes/budgets.route';
+import { authRoutes } from './routes/auth.route';
 
 mongoose
   .connect(
@@ -55,6 +56,7 @@ server.route({
 server.route(recordRoutes);
 server.route(categoryRoutes);
 server.route(budgetRoutes);
+server.route(authRoutes);
 
 // start the server
 const init = async () => {

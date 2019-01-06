@@ -8,7 +8,7 @@ import { BudgetName } from '../enums/budgetname.enum';
 import { csvServiceUrl } from '../config';
 
 import R from 'ramda';
-const { merge, pipe, find, propEq, propOr } = R;
+const { merge, pipe, find, propEq, propOr, pipeP } = R;
 
 const config = {
   headers: { 'Content-Type': 'application/json' }
@@ -95,6 +95,22 @@ function aggregateTotal(aggregates: Array<Aggregate>): (type: number) => number 
       findAggregate,
       total
     )(aggregates) as number;
+  };
+}
+
+export async function categorySum(username: string) {
+  const monthGroupedSum = await groupedSum(username)(...Range.month);
+
+  return monthGroupedSum;
+}
+
+function groupedSum(username: string) {
+  return function(from: Date, to: Date) {
+    return Records.aggregate([
+      { $match: { username } },
+      { $group: { _id: '$category', total: { $sum: '$value' } } },
+      { $sort: { total: -1 } }
+    ]);
   };
 }
 
