@@ -16,7 +16,6 @@
   "dependencies": {
     "@types/axios": "^0.14.0",
     "@types/request": "^2.48.1",
-    "argon2": "^0.20.0",
     "axios": "^0.18.0",
     "boom": "^7.3.0",
     "hapi": "^17.8.1",
@@ -27,7 +26,6 @@
     "web-push": "^3.3.3"
   },
   "devDependencies": {
-    "@types/argon2": "^0.15.0",
     "@types/code": "^4.0.5",
     "@types/hapi": "^17.8.0",
     "@types/lab": "^11.1.0",

@@ -8,7 +8,8 @@ function createUserPayloadSchema() {
       .max(28),
     password: Joi.string()
       .required()
-      .max(28)
+      .max(28),
+    email: Joi.string().required()
   });
 
   return schema;
