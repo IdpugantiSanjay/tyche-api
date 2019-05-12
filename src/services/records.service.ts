@@ -1,5 +1,5 @@
 import { Records } from '../mongodb.models/record.model';
-import { IRecord } from '../ts.models/record.model';
+import { IRecord, RecordSearchParameters } from '../ts.models/record.model';
 import { RecordType } from '../enums/recordtype.enum';
 import Axios from 'axios';
 import { Budget } from '../mongodb.models/budget.model';
@@ -58,8 +58,14 @@ export async function searchRecord(record: IRecord) {
  * @param username username of the filters
  * @param record record object conatining any properties to filter on
  */
-export async function searchRecords(username: string, record?: IRecord) {
-  const response = await Records.find({ username }).sort({ createdDate: -1 });
+export async function searchRecords(username: string, record: RecordSearchParameters) {
+  const response = await Records.find({
+    username,
+    createdDate: {
+      $gte: new Date(record.startDate).toISOString(),
+      $lte: new Date(record.endDate).toISOString()
+    }
+  }).sort({ createdDate: -1 });
   return response;
 }
 
@@ -87,7 +93,9 @@ type Aggregate = { _id: number; total: number };
 function aggregateTotal(aggregates: Array<Aggregate>): (type: number) => number {
   return function(type: number) {
     // find aggregate object having _id as type
-    const findAggregate: (aggregates: Array<Aggregate>) => Aggregate | undefined = find(propEq('_id', type));
+    const findAggregate: (aggregates: Array<Aggregate>) => Aggregate | undefined = find(
+      propEq('_id', type)
+    );
     // get total property
     const total: (aggregate: Aggregate | undefined) => number = propOr(0, 'total');
 
@@ -188,7 +196,10 @@ export class Range {
 
   static get month(): [Date, Date] {
     const [thisMonth, thisYear] = [new Date().getMonth(), new Date().getFullYear()];
-    return [new Date(thisYear, thisMonth, 1, 0, 0, 0), new Date(thisYear, thisMonth + 1, 0, 23, 59, 59)];
+    return [
+      new Date(thisYear, thisMonth, 1, 0, 0, 0),
+      new Date(thisYear, thisMonth + 1, 0, 23, 59, 59)
+    ];
   }
 
   static get year(): [Date, Date] {

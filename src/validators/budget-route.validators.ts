@@ -2,6 +2,9 @@ import * as Hapi from 'hapi';
 import * as Joi from 'joi';
 import { routeParamsUsernameSchema } from './common.validators';
 
+/**
+ * Allow only 4 Budgets
+ */
 function addBudgetsRoutePayloadSchema() {
   const schema = Joi.array()
     .length(4)

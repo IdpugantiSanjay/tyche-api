@@ -10,3 +10,8 @@ export interface IRecord {
 
   username: string;
 }
+
+export type RecordSearchParameters = {
+  startDate: Date;
+  endDate: Date;
+};
