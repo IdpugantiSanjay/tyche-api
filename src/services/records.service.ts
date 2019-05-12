@@ -66,7 +66,7 @@ export async function searchRecords(username: string, searchFilters?: RecordSear
    * Return a mongodb find query object based on inputs
    */
   function buildSearchQuery(): any {
-    if (!searchFilters) return { username };
+    if (!searchFilters || !searchFilters.startDate || !searchFilters.endDate) return { username };
 
     return {
       username,

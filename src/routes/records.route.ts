@@ -9,7 +9,7 @@ import {
   exportRecords,
   categorySum
 } from '../services/records.service';
-import { IRecord, RecordSearchParameters } from '../ts.models/record.model';
+import { IRecord } from '../ts.models/record.model';
 import {
   addRecordRouteValidate,
   searchRecordsRouteValidate,
@@ -24,10 +24,7 @@ const searchRecordsRoute: Hapi.ServerRoute = {
   options: {
     validate: searchRecordsRouteValidate(),
     handler: function(request: Hapi.Request) {
-      const results = searchRecords(
-        request.params.username,
-        request.payload as RecordSearchParameters
-      );
+      const results = searchRecords(request.params.username, request.query as any);
       return results;
     }
   }
@@ -66,19 +63,6 @@ const deleteRecordRoute: Hapi.ServerRoute = {
     }
   }
 };
-
-// const totalSumRoute: Hapi.ServerRoute = {
-//   path: '/api/{username}/records/total',
-//   method: 'GET',
-//   options: {
-//     validate: totalSumRouteValidate(),
-//     handler: function(request: Hapi.Request) {
-//       const queryParams = request.query as Hapi.RequestQuery;
-//       const { startTime, endTime } = queryParams;
-//       return totalSum(request.params.username, new Date(startTime as string), new Date(endTime as string));
-//     }
-//   }
-// };
 
 const categoryGroupedSumRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/categories/sum',

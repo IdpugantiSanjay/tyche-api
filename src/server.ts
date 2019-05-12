@@ -18,7 +18,8 @@ export const server = new Hapi.Server({
     cors: {
       origin: ['*']
     }
-  }
+  },
+  debug: { request: ['error', 'uncaught'] }
 });
 
 const publicKey =
@@ -53,23 +54,6 @@ server.route(recordRoutes);
 server.route(categoryRoutes);
 server.route(budgetRoutes);
 server.route(authRoutes);
-
-server.ext('onPreResponse', function(request: Hapi.Request, h) {
-  var response = request.response as any;
-  // isServer indicates status code >= 500
-  //  if error, pass it through server.log
-  if (response && response.isBoom && response.isServer) {
-    const error = response.error || response.message;
-    server.log(['error'], error);
-  }
-  return h.continue;
-});
-
-server.events.on('log', (event, tags) => {
-  if (tags.error) {
-    console.log(`Server error: ${event.data}`);
-  }
-});
 
 // start the server
 const init = async () => {
