@@ -24,8 +24,6 @@ const searchRecordsRoute: Hapi.ServerRoute = {
   options: {
     validate: searchRecordsRouteValidate(),
     handler: function(request: Hapi.Request) {
-      throw new Error('Testing Hapi Logs');
-
       const results = searchRecords(
         request.params.username,
         request.payload as RecordSearchParameters
