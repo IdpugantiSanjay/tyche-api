@@ -11,11 +11,14 @@ const { merge, map } = R;
  * @param budgets budgets array containing daily, weekly, monthly and yearly budgets
  */
 export async function createBudgets(username: string, budgets: IBudget[]): Promise<any[]> {
-  const promises = map(budget => Budget.updateOne(budget._id, merge(budget, { username })), budgets);
+  const promises = map(
+    budget => Budget.updateOne(budget._id, merge(budget, { username })),
+    budgets
+  );
 
   return await Promise.all(promises);
 }
 
-export async function searchBudgets(username: string, name: string) {
+export async function searchBudgets(username: string) {
   return await Budget.find({ username });
 }

@@ -9,7 +9,7 @@ import {
   exportRecords,
   categorySum
 } from '../services/records.service';
-import { IRecord } from '../ts.models/record.model';
+import { IRecord, RecordSearchParameters } from '../ts.models/record.model';
 import {
   addRecordRouteValidate,
   searchRecordsRouteValidate,
@@ -24,7 +24,12 @@ const searchRecordsRoute: Hapi.ServerRoute = {
   options: {
     validate: searchRecordsRouteValidate(),
     handler: function(request: Hapi.Request) {
-      const results = searchRecords(request.params.username);
+      throw new Error('Testing Hapi Logs');
+
+      const results = searchRecords(
+        request.params.username,
+        request.payload as RecordSearchParameters
+      );
       return results;
     }
   }
@@ -81,12 +86,8 @@ const categoryGroupedSumRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/categories/sum',
   method: 'GET',
   options: {
-    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-      try {
-        return categorySum(request.params.username);
-      } catch (err) {
-        console.log(err);
-      }
+    handler: async function(request: Hapi.Request) {
+      return categorySum(request.params.username);
     }
   }
 };
@@ -96,15 +97,11 @@ const exportRecordsRoute: Hapi.ServerRoute = {
   method: 'GET',
   options: {
     handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-      try {
-        const serverResponse = (await exportRecords(request.params.username)) as AxiosResponse;
-        return h
-          .response({ data: serverResponse.data || '' })
-          .type('text/plain')
-          .code(200);
-      } catch (err) {
-        console.log(err);
-      }
+      const serverResponse = (await exportRecords(request.params.username)) as AxiosResponse;
+      return h
+        .response({ data: serverResponse.data || '' })
+        .type('text/plain')
+        .code(200);
     }
   }
 };

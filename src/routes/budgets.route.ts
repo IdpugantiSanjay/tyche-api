@@ -19,7 +19,7 @@ const searchBudgetsRoute: Hapi.ServerRoute = {
   method: 'GET',
   options: {
     handler: function(request: Hapi.Request) {
-      return searchBudgets(request.params.username as string, request.params.name);
+      return searchBudgets(request.params.username as string);
     }
   }
 };

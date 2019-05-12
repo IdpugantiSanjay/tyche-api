@@ -8,7 +8,7 @@ import { BudgetName } from '../enums/budgetname.enum';
 import { csvServiceUrl } from '../config';
 
 import R from 'ramda';
-const { merge, pipe, find, propEq, propOr, pipeP } = R;
+const { merge, pipe, find, propEq, propOr } = R;
 
 const config = {
   headers: { 'Content-Type': 'application/json' }
@@ -58,15 +58,24 @@ export async function searchRecord(record: IRecord) {
  * @param username username of the filters
  * @param record record object conatining any properties to filter on
  */
-export async function searchRecords(username: string, record: RecordSearchParameters) {
-  const response = await Records.find({
-    username,
-    createdDate: {
-      $gte: new Date(record.startDate).toISOString(),
-      $lte: new Date(record.endDate).toISOString()
-    }
-  }).sort({ createdDate: -1 });
+export async function searchRecords(username: string, searchFilters?: RecordSearchParameters) {
+  const response = await Records.find(buildSearchQuery()).sort({ createdDate: -1 });
   return response;
+
+  /**
+   * Return a mongodb find query object based on inputs
+   */
+  function buildSearchQuery(): any {
+    if (!searchFilters) return { username };
+
+    return {
+      username,
+      createdDate: {
+        $gte: new Date(searchFilters.startDate).toISOString(),
+        $lte: new Date(searchFilters.endDate).toISOString()
+      }
+    };
+  }
 }
 
 /**
@@ -107,13 +116,13 @@ function aggregateTotal(aggregates: Array<Aggregate>): (type: number) => number 
 }
 
 export async function categorySum(username: string) {
-  const monthGroupedSum = await groupedSum(username)(...Range.month);
+  const monthGroupedSum = await groupedSum(username)();
 
   return monthGroupedSum;
 }
 
 function groupedSum(username: string) {
-  return function(from: Date, to: Date) {
+  return function() {
     return Records.aggregate([
       { $match: { username } },
       { $group: { _id: '$category', total: { $sum: '$value' } } },
@@ -128,13 +137,8 @@ function groupedSum(username: string) {
  */
 export async function exportRecords(username: string) {
   const records = await Records.find({ username });
-
-  try {
-    // call external service to process user records in json format
-    return await Axios.post(csvServiceUrl, records, config);
-  } catch (err) {
-    console.log(err);
-  }
+  // call external service to process user records in json format
+  return await Axios.post(csvServiceUrl, records, config);
 }
 
 export async function recordsStatistics(username: string) {

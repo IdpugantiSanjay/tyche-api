@@ -6,13 +6,9 @@ import { randomBytes, pbkdf2Sync } from 'crypto';
 import { merge, pick } from 'ramda';
 
 export async function createUser(user: User) {
-  try {
-    const { hash, salt } = hashPassword(user.password);
-    const response = await UserModel.create(merge(user, { password: hash, salt }));
-    return response;
-  } catch (e) {
-    console.log(e);
-  }
+  const { hash, salt } = hashPassword(user.password);
+  const response = await UserModel.create(merge(user, { password: hash, salt }));
+  return response;
 }
 
 export async function searchUser(user: User) {

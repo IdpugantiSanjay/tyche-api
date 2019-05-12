@@ -6,7 +6,7 @@ const categoriesRoute: Hapi.ServerRoute = {
   path: `/api/{username}/categories/{type}`,
   method: `GET`,
   options: {
-    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+    handler: async function(request: Hapi.Request) {
       return await categories(request.params.type);
     },
     cache: {
@@ -20,7 +20,7 @@ const addCategoryRoute: Hapi.ServerRoute = {
   path: `/api/{username}/categories`,
   method: `POST`,
   options: {
-    handler: async function(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+    handler: async function(request: Hapi.Request) {
       return await addCategory(request.payload as Category);
     }
   }
