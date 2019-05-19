@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 import { connectionString } from './config';
 import { budgetRoutes } from './routes/budgets.route';
 import { authRoutes } from './routes/auth.route';
+import { settingRoutes } from './routes/settings.route';
+import { boomify } from 'boom';
 
 mongoose.connect(connectionString, { useNewUrlParser: true }).catch(err => console.log(err));
 
@@ -22,8 +24,7 @@ export const server = new Hapi.Server({
   debug: { request: ['error', 'uncaught'] }
 });
 
-const publicKey =
-  'BNsTGbCeYfPwet42DdxaJYbuDfJQUwMjASNHfbWdIk0ian-e0v6t13iKyIyJbtjdPLOkNFSe-fBneIgR8PvmqV0';
+const publicKey = 'BNsTGbCeYfPwet42DdxaJYbuDfJQUwMjASNHfbWdIk0ian-e0v6t13iKyIyJbtjdPLOkNFSe-fBneIgR8PvmqV0';
 const privateKey = 'RKs66TcEnr2N8Dk1mCVJ-GTmsNvVAJHo97uS6rjhAnY';
 
 webpush.setVapidDetails('mailto:isanjay112@gmail.com', publicKey, privateKey);
@@ -50,10 +51,22 @@ server.route({
   }
 });
 
+// Transform non-boom errors into boom ones
+server.ext('onPreResponse', function(request, h) {
+  // Transform only server errors
+  if ((request.response as any).isBoom && (request.response as any).isServer) {
+    return boomify(request.response as any);
+  } else {
+    // Otherwise just continue with previous response
+    return h.continue;
+  }
+} as Hapi.Lifecycle.Method);
+
 server.route(recordRoutes);
 server.route(categoryRoutes);
 server.route(budgetRoutes);
 server.route(authRoutes);
+server.route(settingRoutes);
 
 // start the server
 const init = async () => {
