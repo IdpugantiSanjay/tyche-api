@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   createdDate: { type: Date, default: new Date().toISOString() },
   active: { type: Boolean, default: true },
   salt: { type: String, required: true },
+
+  settings: { type: Map, of: Boolean }
 });
 
 export const UserModel = mongoose.model('User', userSchema);

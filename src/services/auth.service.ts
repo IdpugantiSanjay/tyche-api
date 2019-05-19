@@ -14,7 +14,7 @@ export async function createUser(user: User) {
 export async function searchUser(user: User) {
   const foundUser = ((await UserModel.findOne({ username: user.username })) as any) as User;
   if (verifyPassword(foundUser.password, foundUser.salt, user.password)) {
-    return pick(['username', 'email'], foundUser);
+    return pick(['username', 'email', 'settings'], foundUser);
   }
 
   throw new Error('Invalid User');
