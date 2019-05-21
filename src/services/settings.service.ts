@@ -21,6 +21,7 @@ export async function saveUserSettings(username: string, settings: any): Promise
   return pick(['settings'], await user.save());
 }
 
-export function userSettings(username: string) {
-  return UserModel.find({ username }).select('settings');
+export async function userSettings(username: string) {
+  var user: any = await UserModel.findOne({ username }).select('settings');
+  return user;
 }
