@@ -1,1 +1,1 @@
-type BudgetConsumption = { name: string; percentageConsumed: number; consumed: number; label: String };
+export type BudgetConsumption = { name: string; percentageConsumed: number; consumed: number; label: String };

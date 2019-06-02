@@ -8,6 +8,7 @@ import { BudgetName } from '../enums/budgetname.enum';
 import { csvServiceUrl } from '../config';
 
 import R from 'ramda';
+import { BudgetConsumption } from '../types/budgetconsumption';
 const { merge, pipe, find, propEq, propOr } = R;
 
 const config = {
@@ -102,9 +103,7 @@ type Aggregate = { _id: number; total: number };
 function aggregateTotal(aggregates: Array<Aggregate>): (type: number) => number {
   return function(type: number) {
     // find aggregate object having _id as type
-    const findAggregate: (aggregates: Array<Aggregate>) => Aggregate | undefined = find(
-      propEq('_id', type)
-    );
+    const findAggregate: (aggregates: Array<Aggregate>) => Aggregate | undefined = find(propEq('_id', type));
     // get total property
     const total: (aggregate: Aggregate | undefined) => number = propOr(0, 'total');
 
@@ -200,10 +199,7 @@ export class Range {
 
   static get month(): [Date, Date] {
     const [thisMonth, thisYear] = [new Date().getMonth(), new Date().getFullYear()];
-    return [
-      new Date(thisYear, thisMonth, 1, 0, 0, 0),
-      new Date(thisYear, thisMonth + 1, 0, 23, 59, 59)
-    ];
+    return [new Date(thisYear, thisMonth, 1, 0, 0, 0), new Date(thisYear, thisMonth + 1, 0, 23, 59, 59)];
   }
 
   static get year(): [Date, Date] {
