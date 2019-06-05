@@ -9,6 +9,10 @@ import { csvServiceUrl } from '../config';
 
 import R from 'ramda';
 import { BudgetConsumption } from '../types/budgetconsumption';
+import { UserModel } from '../mongodb.models/user.model';
+import { IAccount } from '../ts.models/account.model';
+import { ObjectID } from 'bson';
+
 const { merge, pipe, find, propEq, propOr } = R;
 
 const config = {
@@ -23,6 +27,23 @@ const config = {
 export async function createRecord(username: string, record: IRecord) {
   const recordWithUsername = merge(record, { username });
   const response = await Records.create(recordWithUsername);
+
+  // Deduct if account is not cash
+  // Get the deducted amount from user account balance
+
+  if (!record.accountId) return response;
+
+  // find account by accountId
+  const findAccount = (accounts: Array<IAccount>, accountId: ObjectID): IAccount =>
+    accounts.find(account => account._id == accountId) || ({} as IAccount);
+
+  var user: any = await UserModel.findOne({ username });
+  var account = findAccount(user.accounts, record.accountId);
+  // update account balance
+  account.balance = account.balance - record.value;
+  // save updated balance
+  await user.save();
+
   return response;
 }
 

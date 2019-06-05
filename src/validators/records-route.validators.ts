@@ -16,7 +16,8 @@ function addRecordRoutePayloadSchema() {
       .min(1)
       .max(2)
       .required(),
-    category: Joi.string().required()
+    category: Joi.string().required(),
+    accountId: Joi.string()
   });
 
   return schema;

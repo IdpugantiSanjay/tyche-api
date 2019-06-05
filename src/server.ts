@@ -11,8 +11,9 @@ import { budgetRoutes } from './routes/budgets.route';
 import { authRoutes } from './routes/auth.route';
 import { settingRoutes } from './routes/settings.route';
 import { boomify } from 'boom';
+import { accountRoutes } from './routes/accounts.route';
 
-mongoose.connect(connectionString, { useNewUrlParser: true }).catch(err => console.log(err));
+mongoose.connect(connectionString, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
 
 export const server = new Hapi.Server({
   port: process.env.port || 3000,
@@ -67,8 +68,9 @@ server.route(categoryRoutes);
 server.route(budgetRoutes);
 server.route(authRoutes);
 server.route(settingRoutes);
+server.route(accountRoutes);
 
-// start the server
+// start the server`
 const init = async () => {
   await server.start();
   console.log(`Server running at: ${server.info.uri}`);
