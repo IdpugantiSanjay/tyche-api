@@ -10,7 +10,6 @@ import { csvServiceUrl } from '../config';
 import R from 'ramda';
 import { BudgetConsumption } from '../types/budgetconsumption';
 import { UserModel } from '../mongodb.models/user.model';
-import { IAccount } from '../ts.models/account.model';
 import { ObjectID } from 'bson';
 
 const { merge, pipe, find, propEq, propOr } = R;
@@ -33,16 +32,19 @@ export async function createRecord(username: string, record: IRecord) {
 
   if (!record.accountId) return response;
 
-  // find account by accountId
-  const findAccount = (accounts: Array<IAccount>, accountId: ObjectID): IAccount =>
-    accounts.find(account => account._id == accountId) || ({} as IAccount);
+  // The following is the mongodb query
+  // db.users.updateOne(
+  //   { "accounts._id": ObjectId("5cf7eb030b35175ad0f2e4e2") },
+  //   { $inc: { "accounts.$[elem].balance": 10  } },
+  //   { arrayFilters: [ { "elem._id": ObjectId("5cf7eb030b35175ad0f2e4e2")  } ] }
+  // );
 
-  var user: any = await UserModel.findOne({ username });
-  var account = findAccount(user.accounts, record.accountId);
-  // update account balance
-  account.balance = account.balance - record.value;
-  // save updated balance
-  await user.save();
+  // update account balance when record with account is selected
+  await UserModel.updateOne(
+    { username },
+    { $inc: { 'accounts.$[elem].balance': -record.value } },
+    { arrayFilters: [{ 'elem._id': new ObjectID(record.accountId) }] }
+  );
 
   return response;
 }
@@ -53,7 +55,7 @@ export async function createRecord(username: string, record: IRecord) {
  * @param record properties of the new record
  */
 export async function updateRecord(id: string, record: IRecord) {
-  const response = await Records.findOneAndUpdate({ _id: id }, record);
+  const response = await Records.findByIdAndUpdate(id, record);
   return response;
 }
 
@@ -62,8 +64,20 @@ export async function updateRecord(id: string, record: IRecord) {
  * @param id id of the record to delete
  */
 export async function deleteRecord(id: string) {
-  const response = await Records.findByIdAndDelete(id);
-  return response;
+  // delete the record by id and return the deleted record
+  const deletedRecord: IRecord = await Records.findByIdAndDelete(id).lean();
+
+  // if the deleted record doesn't have accountId return the deleted document
+  if (!deletedRecord.accountId) return deletedRecord;
+
+  // update account balance when record with account is selected
+  await UserModel.updateOne(
+    { username: deletedRecord.username },
+    { $inc: { 'accounts.$[elem].balance': deletedRecord.value } },
+    { arrayFilters: [{ 'elem._id': new ObjectID(deletedRecord.accountId) }] }
+  );
+
+  return deletedRecord;
 }
 
 /**

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const recordSchema = new mongoose.Schema({
   value: { type: Number, required: true },
@@ -6,6 +6,7 @@ const recordSchema = new mongoose.Schema({
   username: { type: String, required: true },
   category: { type: String, required: true },
   createdDate: { type: Date, default: new Date().toISOString() },
+  accountId: { ref: 'Account', type: Schema.Types.ObjectId },
   type: { type: Number, required: true }
 });
 

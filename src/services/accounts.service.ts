@@ -21,7 +21,7 @@ export async function getUserAccounts(username: string): Promise<Array<IAccount>
     .lean(true)
     .exec();
 
-  return user.accounts;
+  return user.accounts || [];
 }
 
 export async function deleteUserAccount(username: string, _id: string): Promise<any> {

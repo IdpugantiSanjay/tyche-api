@@ -17,7 +17,7 @@ function addRecordRoutePayloadSchema() {
       .max(2)
       .required(),
     category: Joi.string().required(),
-    accountId: Joi.string()
+    accountId: Joi.any() // allow any schema type number / string
   });
 
   return schema;
@@ -28,7 +28,6 @@ export function addRecordRouteValidate(): Hapi.RouteOptionsValidate {
     payload: addRecordRoutePayloadSchema(),
     params: { username: routeParamsUsernameSchema() },
     options: {
-      abortEarly: true,
       stripUnknown: true
     }
   } as Hapi.RouteOptionsValidate;

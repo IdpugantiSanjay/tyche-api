@@ -8,8 +8,10 @@ const userSchema = new mongoose.Schema({
   createdDate: { type: Date, default: new Date().toISOString() },
   active: { type: Boolean, default: true },
   salt: { type: String, required: true },
-  accounts: { type: [AccountSchema], default: [] },
+  accounts: { type: [AccountSchema] },
   settings: { type: Map, of: Boolean }
 });
+
+userSchema.index({ username: 1, 'accounts.accountName': 1 });
 
 export const UserModel = mongoose.model('User', userSchema);

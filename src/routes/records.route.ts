@@ -26,7 +26,8 @@ const searchRecordsRoute: Hapi.ServerRoute = {
     handler: function(request: Hapi.Request) {
       const results = searchRecords(request.params.username, request.query as any);
       return results;
-    }
+    },
+    timeout: { server: 1000 }
   }
 };
 
