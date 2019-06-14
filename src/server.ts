@@ -10,7 +10,7 @@ import { connectionString } from './config';
 import { budgetRoutes } from './routes/budgets.route';
 import { authRoutes } from './routes/auth.route';
 import { settingRoutes } from './routes/settings.route';
-import { boomify } from 'boom';
+// import { boomify } from 'boom';
 import { accountRoutes } from './routes/accounts.route';
 
 mongoose.connect(connectionString, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
@@ -33,7 +33,7 @@ webpush.setVapidDetails('mailto:isanjay112@gmail.com', publicKey, privateKey);
 server.route({
   method: 'GET',
   path: '/',
-  handler: function() {
+  handler: function () {
     return 'Hello, World';
   }
 });
@@ -41,7 +41,7 @@ server.route({
 server.route({
   method: 'POST',
   path: '/subscribe',
-  handler: async function(request: Hapi.Request) {
+  handler: async function (request: Hapi.Request) {
     const subscription = request.payload;
     const payload = JSON.stringify({ title: 'Payment Pending' });
 
@@ -53,10 +53,14 @@ server.route({
 });
 
 // Transform non-boom errors into boom ones
-server.ext('onPreResponse', function(request, h) {
+server.ext('onPreResponse', function (request, h) {
+
+
+  var response = request.response as any;
   // Transform only server errors
-  if ((request.response as any).isBoom && (request.response as any).isServer) {
-    return boomify(request.response as any);
+  if (response.isBoom || response.isServer) {
+    var errorMessage = response.error || response.message;
+    return h.response({ message: errorMessage, statusCode: 500, error: 'Internal Server Error' }).code(500).message(errorMessage);
   } else {
     // Otherwise just continue with previous response
     return h.continue;
