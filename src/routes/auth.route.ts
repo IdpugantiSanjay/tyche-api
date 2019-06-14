@@ -8,18 +8,24 @@ const searchUserRoute: Hapi.ServerRoute = {
   method: 'POST',
   options: {
     validate: searchUserRouteValidate(),
-    handler: function(request: Hapi.Request) {
-      return searchUser(request.payload as User);
-    }
+    handler: async function (request: Hapi.Request) {
+      request.log('log', 'Started Searching for Users');
+      var searchResponse = await searchUser(request.payload as User);
+      request.log('log', 'Found the User');
+      console.log(request.logs);
+      return searchResponse;
+    },
+    log: { collect: true },
   }
-};
+}
+
 
 const createUserRoute: Hapi.ServerRoute = {
   path: '/api/users',
   method: 'POST',
   options: {
     validate: createUserRouteValidate(),
-    handler: function(request: Hapi.Request) {
+    handler: function (request: Hapi.Request) {
       return createUser(request.payload as User);
     }
   }
