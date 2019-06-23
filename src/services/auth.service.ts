@@ -27,6 +27,6 @@ function hashPassword(password: string) {
   return { hash: hash.toString('utf8'), salt };
 }
 
-function verifyPassword(hash: string, salt: string, password: string): boolean {
+export function verifyPassword(hash: string, salt: string, password: string): boolean {
   return hash === pbkdf2Sync(password, salt, 10000, 40, 'sha1').toString('utf8');
 }

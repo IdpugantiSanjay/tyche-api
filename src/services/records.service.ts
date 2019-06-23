@@ -42,7 +42,7 @@ export async function createRecord(username: string, record: IRecord) {
   // update account balance when record with account is selected
   await UserModel.updateOne(
     { username },
-    { $inc: { 'accounts.$[elem].balance': -record.value } },
+    { $inc: { 'accounts.$[elem].balance': record.type == 1 ? record.value : -record.value } },
     { arrayFilters: [{ 'elem._id': new ObjectID(record.accountId) }] }
   );
 
@@ -95,22 +95,42 @@ export async function searchRecord(record: IRecord) {
  * @param record record object conatining any properties to filter on
  */
 export async function searchRecords(username: string, searchFilters?: RecordSearchParameters) {
-  const response = await Records.find(buildSearchQuery()).sort({ createdDate: -1 });
+  var response;
+  if (searchFilters && !searchFilters.limit && !searchFilters.skip) {
+    response = await Records.find(buildSearchQuery()).sort({ createdDate: -1 });
+  } else if (searchFilters && searchFilters.limit && searchFilters.skip) {
+    response = await Records.find(buildSearchQuery())
+      .sort({ createdDate: -1 })
+      // .skip(+searchFilters.skip)
+      .limit(+searchFilters.limit);
+  }
   return response;
 
   /**
    * Return a mongodb find query object based on inputs
    */
   function buildSearchQuery(): any {
-    if (!searchFilters || !searchFilters.startDate || !searchFilters.endDate) return { username };
+    if (!searchFilters) return { username };
 
-    return {
-      username,
-      createdDate: {
-        $gte: new Date(searchFilters.startDate).toISOString(),
-        $lte: new Date(searchFilters.endDate).toISOString()
-      }
-    };
+    var query: any = { username };
+
+    if (searchFilters.startDate || searchFilters.endDate) {
+      query.createdDate = {};
+    }
+
+    if (searchFilters.startDate) {
+      query.createdDate.$gte = searchFilters.startDate;
+    }
+
+    if (searchFilters.endDate) {
+      query.createdDate.$lte = searchFilters.endDate;
+    }
+
+    if (searchFilters.accountId) {
+      query.accountId = new ObjectID(searchFilters.accountId);
+    }
+
+    return query;
   }
 }
 

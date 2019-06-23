@@ -27,7 +27,8 @@ const searchRecordsRoute: Hapi.ServerRoute = {
       const results = searchRecords(request.params.username, request.query as any);
       return results;
     },
-    timeout: { server: 1000 }
+    timeout: { server: 1000 },
+    auth: 'jwt'
   }
 };
 
@@ -39,7 +40,8 @@ const addRecordRoute: Hapi.ServerRoute = {
     validate: addRecordRouteValidate(),
     handler: function(request: Hapi.Request) {
       return createRecord(request.params.username, request.payload as IRecord);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -50,7 +52,8 @@ const updateRecordRoute: Hapi.ServerRoute = {
     validate: updateRecordRouteValidate(),
     handler: function(request: Hapi.Request) {
       return updateRecord(request.params.id, request.payload as IRecord);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -61,7 +64,8 @@ const deleteRecordRoute: Hapi.ServerRoute = {
     validate: deleteRecordRouteValidate(),
     handler: function(request: Hapi.Request) {
       return deleteRecord(request.params.id);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -71,7 +75,8 @@ const categoryGroupedSumRoute: Hapi.ServerRoute = {
   options: {
     handler: async function(request: Hapi.Request) {
       return categorySum(request.params.username);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -85,7 +90,8 @@ const exportRecordsRoute: Hapi.ServerRoute = {
         .response({ data: serverResponse.data || '' })
         .type('text/plain')
         .code(200);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -95,7 +101,8 @@ const statisticsRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return recordsStatistics(request.params.username);
-    }
+    },
+    auth: 'jwt'
   }
 };
 

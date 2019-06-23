@@ -10,7 +10,8 @@ const addBudgetsRoute: Hapi.ServerRoute = {
     validate: addBudgetsRouteValidate(),
     handler: function(request: Hapi.Request) {
       return createBudgets(request.params.username, request.payload as IBudget[]);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -20,7 +21,8 @@ const searchBudgetsRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return searchBudgets(request.params.username as string);
-    }
+    },
+    auth: 'jwt'
   }
 };
 

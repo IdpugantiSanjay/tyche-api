@@ -8,7 +8,8 @@ const userSettingsRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return userSettings(request.params.username);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -18,7 +19,8 @@ const saveUserSettingsRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return saveUserSettings(request.params.username, request.payload as any);
-    }
+    },
+    auth: 'jwt'
   }
 };
 

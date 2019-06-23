@@ -8,7 +8,8 @@ const getUserAccountsRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return getUserAccounts(request.params.username);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -18,7 +19,8 @@ const saveUserAccountRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return saveUserAccount(request.params.username, request.payload as IAccount);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -28,7 +30,8 @@ var deleteUserAccountRoute: Hapi.ServerRoute = {
   options: {
     handler: function(request: Hapi.Request) {
       return deleteUserAccount(request.params.username, request.params.id);
-    }
+    },
+    auth: 'jwt'
   }
 };
 

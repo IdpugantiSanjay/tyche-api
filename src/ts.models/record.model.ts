@@ -15,4 +15,7 @@ export interface IRecord {
 export type RecordSearchParameters = {
   startDate: Date;
   endDate: Date;
+  accountId: string;
+  limit: number;
+  skip: number;
 };

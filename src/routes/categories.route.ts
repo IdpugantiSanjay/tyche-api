@@ -12,7 +12,8 @@ const categoriesRoute: Hapi.ServerRoute = {
     cache: {
       expiresIn: 86400,
       privacy: 'public'
-    }
+    },
+    auth: 'jwt'
   }
 };
 
@@ -22,7 +23,8 @@ const addCategoryRoute: Hapi.ServerRoute = {
   options: {
     handler: async function(request: Hapi.Request) {
       return await addCategory(request.payload as Category);
-    }
+    },
+    auth: 'jwt'
   }
 };
 
