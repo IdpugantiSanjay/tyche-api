@@ -6,7 +6,8 @@ import { categoryRoutes } from './routes/categories.route';
 
 import mongoose from 'mongoose';
 
-import { connectionString } from './config';
+import configOptions from './options';
+
 import { budgetRoutes } from './routes/budgets.route';
 import { authRoutes } from './routes/auth.route';
 import { settingRoutes } from './routes/settings.route';
@@ -19,7 +20,9 @@ import { User } from './ts.models/user.model';
 import Boom from 'boom';
 import { verifyPassword } from './services/auth.service';
 
-mongoose.connect(connectionString, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
+
+
+mongoose.connect(configOptions.connectionString, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
 
 export const server = new Hapi.Server({
   port: process.env.port || 3000,
@@ -39,7 +42,7 @@ webpush.setVapidDetails('mailto:isanjay112@gmail.com', publicKey, privateKey);
 server.route({
   method: 'GET',
   path: '/',
-  handler: function() {
+  handler: function () {
     return 'Hello, World';
   }
 });
@@ -47,7 +50,7 @@ server.route({
 server.route({
   method: 'POST',
   path: '/subscribe',
-  handler: async function(request: Hapi.Request) {
+  handler: async function (request: Hapi.Request) {
     const subscription = request.payload;
     const payload = JSON.stringify({ title: 'Payment Pending' });
 
@@ -59,7 +62,7 @@ server.route({
 });
 
 // Transform non-boom errors into boom ones
-server.ext('onPreResponse', function(request, h) {
+server.ext('onPreResponse', function (request, h) {
   var response = request.response as any;
 
   if (response && response.output && response.output.statusCode === 401) {
@@ -79,7 +82,7 @@ server.ext('onPreResponse', function(request, h) {
   }
 } as Hapi.Lifecycle.Method);
 
-(async function() {
+(async function () {
   async function validate(decoded: Partial<User>) {
     var { username, password } = decoded;
 
@@ -96,7 +99,7 @@ server.ext('onPreResponse', function(request, h) {
 
   await server.register(require('hapi-auth-jwt2'));
   server.auth.strategy('jwt', 'jwt', {
-    key: 'SANJAYTHEBOSS', // Never Share your secret key
+    key: configOptions.jwtAuthStrategyKey, // Never Share your secret key
     validate: validate, // validate function defined above
     verifyOptions: { algorithms: ['HS256'] } // pick a strong algorithm
   });

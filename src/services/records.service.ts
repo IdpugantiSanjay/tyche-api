@@ -5,7 +5,7 @@ import Axios from 'axios';
 import { Budget } from '../mongodb.models/budget.model';
 import { BudgetName } from '../enums/budgetname.enum';
 
-import { csvServiceUrl } from '../config';
+// import { csvServiceUrl } from '../config';
 
 import R from 'ramda';
 import { BudgetConsumption } from '../types/budgetconsumption';
@@ -156,7 +156,7 @@ async function totalSum(username: string, startTime: Date, endTime: Date): Promi
  */
 type Aggregate = { _id: number; total: number };
 function aggregateTotal(aggregates: Array<Aggregate>): (type: number) => number {
-  return function(type: number) {
+  return function (type: number) {
     // find aggregate object having _id as type
     const findAggregate: (aggregates: Array<Aggregate>) => Aggregate | undefined = find(propEq('_id', type));
     // get total property
@@ -176,7 +176,7 @@ export async function categorySum(username: string) {
 }
 
 function groupedSum(username: string) {
-  return function() {
+  return function () {
     return Records.aggregate([
       { $match: { username } },
       { $group: { _id: '$category', total: { $sum: '$value' } } },
@@ -192,7 +192,7 @@ function groupedSum(username: string) {
 export async function exportRecords(username: string) {
   const records = await Records.find({ username });
   // call external service to process user records in json format
-  return await Axios.post(csvServiceUrl, records, config);
+  return await Axios.post('', records, config);
 }
 
 export async function recordsStatistics(username: string) {
