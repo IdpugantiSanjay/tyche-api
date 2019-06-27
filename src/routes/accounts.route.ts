@@ -1,5 +1,10 @@
 import * as Hapi from 'hapi';
-import { getUserAccounts, saveUserAccount, deleteUserAccount } from '../services/accounts.service';
+import {
+  getUserAccounts,
+  saveUserAccount,
+  deleteUserAccount,
+  updateUserAccount
+} from '../services/accounts.service';
 import { IAccount } from '../ts.models/account.model';
 
 const getUserAccountsRoute: Hapi.ServerRoute = {
@@ -24,6 +29,17 @@ const saveUserAccountRoute: Hapi.ServerRoute = {
   }
 };
 
+const updateUserAccountRoute: Hapi.ServerRoute = {
+  path: '/api/{username}/accounts/{id}',
+  method: 'PUT',
+  options: {
+    handler: function(request: Hapi.Request) {
+      return updateUserAccount(request.params.username, request.payload as IAccount);
+    },
+    auth: 'jwt'
+  }
+};
+
 var deleteUserAccountRoute: Hapi.ServerRoute = {
   path: '/api/{username}/accounts/{id}',
   method: 'DELETE',
@@ -35,4 +51,9 @@ var deleteUserAccountRoute: Hapi.ServerRoute = {
   }
 };
 
-export const accountRoutes = [getUserAccountsRoute, saveUserAccountRoute, deleteUserAccountRoute];
+export const accountRoutes = [
+  getUserAccountsRoute,
+  saveUserAccountRoute,
+  deleteUserAccountRoute,
+  updateUserAccountRoute
+];

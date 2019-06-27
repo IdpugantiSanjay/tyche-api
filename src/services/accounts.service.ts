@@ -12,6 +12,22 @@ export async function saveUserAccount(username: string, account: IAccount): Prom
   return true;
 }
 
+export async function updateUserAccount(username: string, account: IAccount): Promise<IAccount> {
+  return await UserModel.findOneAndUpdate(
+    { username, 'accounts._id': account._id },
+    { $set: { 'accounts.$': account } }
+  )
+    .lean()
+    .exec()
+    .then((user: User) => user.accounts)
+    .then(getUpdatedAccount);
+
+  function getUpdatedAccount(accounts: Array<IAccount>): IAccount {
+    var updatedUserAccountIndex = accounts.findIndex(account => (account._id = account._id));
+    return accounts[updatedUserAccountIndex];
+  }
+}
+
 /**
  * Return the settings of a user
  * @param username The name of the user whose setting to return
