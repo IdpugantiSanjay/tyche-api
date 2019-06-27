@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 import * as Hapi from 'hapi';
-import { routeParamsUsernameSchema } from './common.validators';
+import { routeParamsRecordIdSchema, baseRouteValidator } from './common.validators';
 
 function addRecordRoutePayloadSchema() {
   const schema = Joi.object().keys({
@@ -23,53 +23,7 @@ function addRecordRoutePayloadSchema() {
   return schema;
 }
 
-export function addRecordRouteValidate(): Hapi.RouteOptionsValidate {
-  return {
-    payload: addRecordRoutePayloadSchema(),
-    params: { username: routeParamsUsernameSchema() },
-    options: {
-      stripUnknown: true
-    }
-  } as Hapi.RouteOptionsValidate;
-}
-
-export function routeParamsRecordIdSchema() {
-  const schema = Joi.string().regex(new RegExp('^[0-9a-fA-F]{24}$'));
-  return schema;
-}
-
-export function searchRecordsRouteValidate(): Hapi.RouteOptionsValidate {
-  return {
-    params: { username: routeParamsUsernameSchema() },
-    options: {
-      abortEarly: true,
-      stripUnknown: true
-    }
-  } as Hapi.RouteOptionsValidate;
-}
-
-export function updateRecordRouteValidate(): Hapi.RouteOptionsValidate {
-  return {
-    payload: updateRecordRoutePayloadSchema(),
-    params: { username: routeParamsUsernameSchema(), id: routeParamsRecordIdSchema() },
-    options: {
-      abortEarly: true,
-      stripUnknown: true
-    }
-  } as Hapi.RouteOptionsValidate;
-}
-
-export function deleteRecordRouteValidate(): Hapi.RouteOptionsValidate {
-  return {
-    params: { username: routeParamsUsernameSchema(), id: routeParamsRecordIdSchema() },
-    options: {
-      abortEarly: true,
-      stripUnknown: true
-    }
-  } as Hapi.RouteOptionsValidate;
-}
-
-export function updateRecordRoutePayloadSchema() {
+function updateRecordRoutePayloadSchema() {
   const schema = Joi.object().keys({
     value: Joi.number()
       .min(1)
@@ -87,9 +41,18 @@ export function updateRecordRoutePayloadSchema() {
   return schema;
 }
 
-export function totalSumRouteValidate() {
-  return {
-    params: { username: routeParamsUsernameSchema() },
-    query: { startTime: Joi.string().required(), endTime: Joi.string().required() }
-  } as Hapi.RouteOptionsValidate;
-}
+export var addRecordRouteValidator = Object.create(baseRouteValidator, {
+  payload: { value: addRecordRoutePayloadSchema(), writable: true }
+});
+
+export var updateRecordRouteValidator: Hapi.RouteOptionsValidate = Object.create(baseRouteValidator, {
+  payload: { value: updateRecordRoutePayloadSchema(), writable: true }
+});
+
+export var deleteRecordRouteValidator: Hapi.RouteOptionsValidate = Object.create(baseRouteValidator, {
+  id: { value: routeParamsRecordIdSchema(), writable: true }
+});
+
+export var totalSumRouteValidator = Object.create(baseRouteValidator, {
+  query: { value: { startTime: Joi.string().required(), endTime: Joi.string().required() }, writable: true }
+});

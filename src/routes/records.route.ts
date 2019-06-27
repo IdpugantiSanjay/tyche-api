@@ -11,18 +11,18 @@ import {
 } from '../services/records.service';
 import { IRecord } from '../ts.models/record.model';
 import {
-  addRecordRouteValidate,
-  searchRecordsRouteValidate,
-  updateRecordRouteValidate,
-  deleteRecordRouteValidate
+  addRecordRouteValidator,
+  updateRecordRouteValidator,
+  deleteRecordRouteValidator
 } from '../validators/records-route.validators';
 import { AxiosResponse } from 'axios';
+import { baseRouteValidator } from '../validators/common.validators';
 
 const searchRecordsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records',
   method: 'GET',
   options: {
-    validate: searchRecordsRouteValidate(),
+    validate: baseRouteValidator,
     handler: function(request: Hapi.Request) {
       const results = searchRecords(request.params.username, request.query as any);
       return results;
@@ -37,7 +37,7 @@ const addRecordRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records',
   method: 'POST',
   options: {
-    validate: addRecordRouteValidate(),
+    validate: addRecordRouteValidator,
     handler: function(request: Hapi.Request) {
       return createRecord(request.params.username, request.payload as IRecord);
     },
@@ -49,7 +49,7 @@ const updateRecordRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/{id}',
   method: 'PUT',
   options: {
-    validate: updateRecordRouteValidate(),
+    validate: updateRecordRouteValidator,
     handler: function(request: Hapi.Request) {
       return updateRecord(request.params.id, request.payload as IRecord);
     },
@@ -61,7 +61,7 @@ const deleteRecordRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/{id}',
   method: 'DELETE',
   options: {
-    validate: deleteRecordRouteValidate(),
+    validate: deleteRecordRouteValidator,
     handler: function(request: Hapi.Request) {
       return deleteRecord(request.params.id);
     },

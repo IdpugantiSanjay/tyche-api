@@ -1,5 +1,5 @@
-import * as Hapi from 'hapi';
 import * as Joi from 'joi';
+import { baseAuthRouteValidator } from './common.validators';
 
 function createUserPayloadSchema() {
   const schema = Joi.object().keys({
@@ -28,30 +28,10 @@ function searchUserRoutePayloadSchema() {
   return schema;
 }
 
-export function createUserRouteValidate(): Hapi.RouteOptionsValidate {
-  return {
-    payload: createUserPayloadSchema(),
-    options: {
-      abortEarly: true,
-      stripUnknown: true
-    },
-    failAction: defaultFailAction
-  } as Hapi.RouteOptionsValidate;
-}
+export var createUserRouteValidator = Object.create(baseAuthRouteValidator, {
+  payload: { value: createUserPayloadSchema(), writable: true }
+});
 
-export function searchUserRouteValidate(): Hapi.RouteOptionsValidate {
-  return {
-    payload: searchUserRoutePayloadSchema(),
-    options: {
-      abortEarly: true,
-      stripUnknown: true,
-    },
-    failAction: defaultFailAction
-  } as Hapi.RouteOptionsValidate;
-}
-
-
-
-export var defaultFailAction: Hapi.Lifecycle.Method = (_request, h, error: any) => {
-  return error.isJoi ? h.response(error.details[0]).takeover().code(500).message(error.details[0]) : h.response(error).takeover();
-}
+export var searchUserRouteValidator = Object.create(baseAuthRouteValidator, {
+  payload: { value: searchUserRoutePayloadSchema(), writable: true }
+});
