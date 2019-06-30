@@ -49,9 +49,8 @@ export var updateRecordRouteValidator: Hapi.RouteOptionsValidate = Object.create
   payload: { value: updateRecordRoutePayloadSchema(), writable: true }
 });
 
-export var deleteRecordRouteValidator: Hapi.RouteOptionsValidate = Object.create(baseRouteValidator, {
-  id: { value: routeParamsRecordIdSchema(), writable: true }
-});
+export var deleteRecordRouteValidator: Hapi.RouteOptionsValidate = Object.create(baseRouteValidator);
+(deleteRecordRouteValidator.params as any).id = routeParamsRecordIdSchema();
 
 export var totalSumRouteValidator = Object.create(baseRouteValidator, {
   query: { value: { startTime: Joi.string().required(), endTime: Joi.string().required() }, writable: true }
