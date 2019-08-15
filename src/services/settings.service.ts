@@ -21,7 +21,7 @@ export async function saveUserSettings(username: string, settings: any): Promise
   }
 
   // set saved settings user object
-  keys(settings).forEach(setting => user.settings.set(setting, settings[settings]));
+  keys(settings).forEach(setting => user.settings.set(setting, settings[setting]));
 
   // save the changes user object
   user = await user.save();
