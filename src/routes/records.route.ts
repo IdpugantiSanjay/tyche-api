@@ -95,6 +95,17 @@ const exportRecordsRoute: Hapi.ServerRoute = {
   }
 };
 
+const importRecordsRoute: Hapi.ServerRoute = {
+  path: '/api/{username}/records/import',
+  method: 'POST',
+  options: {
+    handler: async function(_request: Hapi.Request, _h: Hapi.ResponseToolkit) {
+      return 'Imported File';
+    },
+    auth: 'jwt'
+  }
+};
+
 const statisticsRoute: Hapi.ServerRoute = {
   path: '/api/{username}/records/statistics',
   method: 'GET',
@@ -113,5 +124,6 @@ export const recordRoutes = [
   deleteRecordRoute,
   exportRecordsRoute,
   statisticsRoute,
-  categoryGroupedSumRoute
+  categoryGroupedSumRoute,
+  importRecordsRoute
 ];
