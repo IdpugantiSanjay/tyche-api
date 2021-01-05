@@ -15,7 +15,7 @@
     "url": "https://sanjay11.visualstudio.com/tyche-api/_git/tyche-api"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "boom": "^7.3.0",
     "hapi": "^18.1.0",
     "hapi-auth-jwt2": "^8.6.1",
